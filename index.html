@@ -4,18 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notes App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1> <img src="notes.png" alt="">Notes</h1>
-        <button> <img src="edit.png" alt="">Create Notes</button>
-        <div class="notes-container">
-            <!-- <p contenteditable="true" class="input-box">
-                <img src="images/delete.png" alt="">
-            </p> -->
+    <div class="app">
+        <div class="header">
+            <div class="logo">
+                <!-- <div class="logo-lines">
+                    <div class="logo-line"></div>
+                    <div class="logo-line"></div>
+                    <div class="logo-line"></div>
+                </div> -->
+                <img src="notes.png" alt="">
+            </div>
+            <div class="header-text">
+                <h1>Notes</h1>
+                <p>Your thoughts, ideas, and notes in one place.</p>
+            </div>
+        </div>
+
+        <div class="layout">
+            <div class="sidebar">
+                <button class="create-btn" id="createBtn">
+                    <i class="ti ti-pencil"></i>
+                    Create Note
+                </button>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="ti ti-bulb"></i></div>
+                    <h3>Quick &amp; Simple</h3>
+                    <p>Create, view, and manage your notes effortlessly.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="ti ti-shield-check"></i></div>
+                    <h3>Safe &amp; Private</h3>
+                    <p>Your notes are saved securely in your browser.</p>
+                </div>
+            </div>
+
+            <div class="notes-area" id="notesArea"></div>
+        </div>
+
+        <div class="footer">
+            <i class="ti ti-heart-filled"></i>
+            Designed &amp; Developed by <a href="#">Kanwal Imran</a>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
