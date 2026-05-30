@@ -1,52 +1,93 @@
-const notesContainer = document.querySelector(".notes-container");
-const createBtn = document.querySelector("button");
+const notesArea = document.getElementById('notesArea');
+const createBtn = document.getElementById('createBtn');
 
-// show saved notes
-function showNotes() {
-    const data = localStorage.getItem("notes");
-    if (data) {
-        notesContainer.innerHTML = data;
-    }
+function getTimestamp() {
+    const now = new Date();
+    return now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        + ' • ' +
+        now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 }
-showNotes();
 
-// save notes (empty note save nahi hoga)
-function updateNotes() {
-    const notes = document.querySelectorAll(".input-box");
-    let html = "";
+function saveNotes() {
+    const cards = notesArea.querySelectorAll('.note-card');
+    const notes = [];
+    cards.forEach(card => {
+        notes.push({
+            id: card.dataset.id,
+            title: card.querySelector('.note-title-input').value,
+            date: card.querySelector('.note-date span').textContent,
+            content: card.querySelector('.note-input').value
+        });
+    });
+    localStorage.setItem('notes_app_data', JSON.stringify(notes));
+}
 
-    notes.forEach(note => {
-        if (note.innerText.trim() !== "") {
-            html += note.outerHTML;
+function autoResize(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+}
+
+function renderNote(id, title, date, content) {
+    const empty = notesArea.querySelector('.empty-state');
+    if (empty) empty.remove();
+
+    const card = document.createElement('div');
+    card.className = 'note-card';
+    card.dataset.id = id;
+    card.innerHTML = `
+        <div class="note-header">
+            <div class="note-meta">
+                <input class="note-title-input" value="${title}" placeholder="Note title" />
+                <div class="note-date">
+                    <i class="ti ti-calendar"></i>
+                    <span>${date}</span>
+                </div>
+            </div>
+            <div class="note-actions">
+                <button title="Delete" class="del-btn"><i class="ti ti-trash"></i></button>
+            </div>
+        </div>
+        <div class="note-divider"></div>
+        <textarea class="note-input" placeholder="Start typing your note...">${content}</textarea>
+    `;
+
+    card.querySelector('.del-btn').addEventListener('click', () => {
+        card.remove();
+        if (!notesArea.querySelectorAll('.note-card').length) {
+            notesArea.innerHTML = '<p class="empty-state">No notes yet. Click "Create Note" to get started.</p>';
         }
+        saveNotes();
     });
 
-    localStorage.setItem("notes", html);
+    card.querySelector('.note-title-input').addEventListener('input', saveNotes);
+
+    const textarea = card.querySelector('.note-input');
+    textarea.addEventListener('input', () => {
+        autoResize(textarea);
+        saveNotes();
+    });
+
+    notesArea.appendChild(card);
+    setTimeout(() => autoResize(textarea), 0);
 }
 
-// create note
-createBtn.addEventListener("click", () => {
-    let inputBox = document.createElement("p");
-    let img = document.createElement("img");
-
-    inputBox.className = "input-box";
-    inputBox.setAttribute("contenteditable", "true");
-
-    img.src = "delete.png";
-
-    notesContainer.appendChild(inputBox).appendChild(img);
-    inputBox.focus();
-});
-
-// delete note
-notesContainer.addEventListener("click", (e) => {
-    if (e.target.tagName === "IMG") {
-        e.target.parentElement.remove();
-        updateNotes();
+function loadNotes() {
+    const saved = localStorage.getItem('notes_app_data');
+    if (saved) {
+        const notes = JSON.parse(saved);
+        notes.forEach(n => renderNote(n.id, n.title, n.date, n.content));
     }
+    if (!notesArea.querySelectorAll('.note-card').length) {
+        notesArea.innerHTML = '<p class="empty-state">No notes yet. Click "Create Note" to get started.</p>';
+    }
+}
+
+createBtn.addEventListener('click', () => {
+    const id = Date.now().toString();
+    renderNote(id, 'My Note', getTimestamp(), '');
+    saveNotes();
+    const cards = notesArea.querySelectorAll('.note-card');
+    cards[cards.length - 1].querySelector('.note-input').focus();
 });
 
-// auto save while typing
-notesContainer.addEventListener("input", () => {
-    updateNotes();
-});
+loadNotes();
